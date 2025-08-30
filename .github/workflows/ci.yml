@@ -5,21 +5,17 @@ on:
   schedule:
     - cron: "*/5 * * * *" # Every 5 minutes
 
-concurrency:
-  group: Swagswagy23-${{ matrix.os }}-${{ matrix.version }}
-  cancel-in-progress: true
-
 jobs:
   npm-automation:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest] # drop macOS if minutes are limited
         version: ["dependency-insight@1.0.0", "dependency-insight@latest"]
-      max-parallel: 6
+      max-parallel: 4
     steps:
       - name: Setup Node
-        uses: actions/setup-node@v4 # Updated to latest version
+        uses: actions/setup-node@v4
         with:
           node-version: 18
       - name: Install Package
