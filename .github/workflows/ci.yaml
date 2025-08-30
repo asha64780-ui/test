@@ -1,0 +1,26 @@
+name: Swagyswagy23test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+concurrency:
+  group: Swagswagy23
+
+jobs:
+  npm-automation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check it out
+        uses: actions/checkout@v3
+      - name: Set it up
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Ins it
+        run: npm install -g dependency-insight
+      - name: Con it
+        run: npm uninstall -g dependency-insight
+      - name: Goodbye
+        run: npm cache clean --force
