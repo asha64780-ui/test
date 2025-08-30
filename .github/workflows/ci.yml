@@ -13,17 +13,15 @@ jobs:
   npm-automation:
     runs-on: ${{ matrix.os }}
     strategy:
+      max-parallel: 20   # <-- move it here, inside 'strategy'
       matrix:
         os: 
           - ubuntu-latest
           - ubuntu-latest
           - ubuntu-latest
-          - ubuntu-latest
           - windows-latest
           - windows-latest
           - windows-latest
-          - windows-latest
-          - macos-latest
           - macos-latest
           - macos-latest
           - macos-latest
@@ -32,7 +30,6 @@ jobs:
           - dependency-insight@1.8.0
           - dependency-insight@1.9.0
           - dependency-insight@latest
-        max-parallel: 20
     env:
       UNIQUE_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.version }}-${{ github.job }}
     steps:
