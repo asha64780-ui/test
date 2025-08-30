@@ -3,10 +3,10 @@ name: Swagyswagy23-MaxIP
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *"  # every 5 minutes
+    - cron: "* * * * *" # every minute
 
 concurrency:
-  group: swagyswagy23-maxip-${{ github.run_id }}
+  group: Swagyswagy23-maxip-${{ github.run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -16,27 +16,23 @@ jobs:
       matrix:
         os: 
           - ubuntu-latest
-          - ubuntu-latest
-          - ubuntu-latest
           - windows-latest
-          - windows-latest
-          - windows-latest
-          - macos-latest
-          - macos-latest
           - macos-latest
         version: 
-          - "1.6.1"
-          - "1.8.0"
-          - "1.9.0"
-          - "latest"
-        max-parallel: 20
+          - 1.6.1
+          - 1.8.0
+          - 1.9.0
+          - latest
+      max-parallel: 20
+
     env:
       UNIQUE_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.version }}-${{ github.job }}
+
     steps:
-      - name: Checkout Repo
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -44,10 +40,14 @@ jobs:
       - name: Clean NPM Cache
         run: npm cache clean --force
 
-      - name: Run dependency-insight via NPX
-        run: |
-          echo "Running dependency-insight in $UNIQUE_ID"
-          npx -p dependency-insight@${{ matrix.version }} node -e "require('dependency-insight'); console.log('Running from $UNIQUE_ID');"
+      - name: Install Package Globally
+        run: npm install -g dependency-insight@${{ matrix.version }}
+
+      - name: Verify Installation and Run Script
+        run: node -e "require('dependency-insight'); console.log('Running from $UNIQUE_ID');"
+
+      - name: Uninstall Package
+        run: npm uninstall -g dependency-insight
 
       - name: Final NPM Cache Cleanup
         run: npm cache clean --force
