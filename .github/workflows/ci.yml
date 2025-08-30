@@ -3,24 +3,27 @@ name: Swagyswagy23test
 on:
   workflow_dispatch:
   schedule:
-    - cron: "* * * * *"
+    - cron: "*/5 * * * *" 
 
 concurrency:
-  group: Swagswagy23
+  group: Swagswagy23-${{ matrix.os }}-${{ matrix.version }}
 
 jobs:
   npm-automation:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        version: ["dependency-insight@1.0.0", "dependency-insight@latest"]
+      max-parallel: 6
     steps:
-      - name: Check it out
-        uses: actions/checkout@v3
-      - name: Set it up
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
-      - name: Ins it
-        run: npm install -g dependency-insight
-      - name: Con it
-        run: npm uninstall -g dependency-insight
-      - name: Goodbye
-        run: npm cache clean --force
+          node-version: 18
+      - name: Install Package
+        run: npm install -g ${{ matrix.version }}
+      - name: Simulate Usage
+        run: |
+          echo "require('dependency-insight');" > test.js
+          node test.js
