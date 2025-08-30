@@ -3,7 +3,7 @@ name: Swagyswagy23test
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "* * * * *"
 
 concurrency:
   group: Swagswagy23
