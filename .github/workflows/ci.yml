@@ -3,10 +3,11 @@ name: Swagyswagy23test
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *" 
+    - cron: "*/5 * * * *" # Every 5 minutes
 
 concurrency:
   group: Swagswagy23-${{ matrix.os }}-${{ matrix.version }}
+  cancel-in-progress: true
 
 jobs:
   npm-automation:
@@ -18,7 +19,7 @@ jobs:
       max-parallel: 6
     steps:
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # Updated to latest version
         with:
           node-version: 18
       - name: Install Package
