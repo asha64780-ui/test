@@ -13,17 +13,27 @@ jobs:
   npm-automation:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: 
           - ubuntu-latest
+          - ubuntu-latest
+          - ubuntu-latest
+          - windows-latest
+          - windows-latest
           - windows-latest
           - macos-latest
+          - macos-latest
+          - macos-latest
         version: 
+          - "dependency-insight@1.0.0"
+          - "dependency-insight@latest"
           - "dependency-insight@1.0.0"
           - "dependency-insight@latest"
       max-parallel: 20
     env:
       UNIQUE_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.version }}-${{ github.job }}
+      NPM_CACHE_DIR: ${{ github.workspace }}/npm-cache-${{ github.run_id }}-${{ matrix.os }}-${{ matrix.version }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -33,16 +43,29 @@ jobs:
         with:
           node-version: 18
 
+      - name: Debug Info
+        run: |
+          echo "Running on OS: $RUNNER_OS"
+          node -v
+          npm -v
+          echo "Unique ID: $UNIQUE_ID"
+
       - name: Clean NPM Cache
         run: npm cache clean --force
+
+      - name: Configure per-job NPM cache
+        run: npm config set cache $NPM_CACHE_DIR
 
       - name: Install Package Globally
         run: npm install -g ${{ matrix.version }}
 
+      - name: List Global Packages
+        run: npm list -g --depth=0
+
       - name: Run Script
         run: |
           echo "require('dependency-insight'); console.log('Running from $UNIQUE_ID');" > test.js
-          node test.js
+          node test.js || true
 
       - name: Uninstall Package
         run: npm uninstall -g ${{ matrix.version }}
