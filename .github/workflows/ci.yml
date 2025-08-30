@@ -3,10 +3,10 @@ name: Swagyswagy23-MaxIP
 on:
   workflow_dispatch:
   schedule:
-    - cron: "* * * * *" # every minute
+    - cron: "*/5 * * * *" # every 5 minutes
 
 concurrency:
-  group: Swagswagy23-maxip-${{ github.run_id }}
+  group: Swagyswagy23-maxip-${{ github.run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -14,17 +14,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: 
-          - ubuntu-latest
-          - windows-latest
-          - macos-latest
-        version: 
-          - "dependency-insight@latest"
-          - "dependency-insight@1.8.0"
-          - "dependency-insight@1.6.1"
-      max-parallel: 9
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        version: [1.6.1, 1.8.0, 1.9.0, latest]
+        run_id: [1,2,3,4,5,6,7,8]  # 3 OS x 4 versions x 8 run_ids = 96 jobs
+      max-parallel: 20
+    continue-on-error: true
     env:
-      UNIQUE_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.version }}-${{ github.job }}
+      UNIQUE_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.version }}-${{ matrix.run_id }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -37,16 +33,17 @@ jobs:
       - name: Clean NPM Cache
         run: npm cache clean --force
 
-      - name: Install Package Globally
-        run: npm install -g ${{ matrix.version }}
+      - name: Install Package Locally
+        run: npm install ${{ matrix.version }}
 
       - name: Run Script
         run: |
-          echo "require('dependency-insight'); console.log('Running from $UNIQUE_ID');" > test.js
+          PACKAGE_NAME=$(echo ${{ matrix.version }} | cut -d'@' -f1)
+          echo "require('./node_modules/$PACKAGE_NAME'); console.log('Running from $UNIQUE_ID');" > test.js
           node test.js
 
       - name: Uninstall Package
-        run: npm uninstall -g ${{ matrix.version }}
+        run: npm uninstall ${{ matrix.version }}
 
       - name: Final NPM Cache Cleanup
         run: npm cache clean --force
