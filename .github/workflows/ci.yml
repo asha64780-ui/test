@@ -3,19 +3,18 @@ name: Swagyswagy23-MaxIP
 on:
   workflow_dispatch:
   schedule:
-    - cron: "* * * * *" # every minute
+    - cron: "*/5 * * * *"  # every 5 minutes
 
 concurrency:
-  group: Swagyswagy23-maxip-${{ github.run_id }}
+  group: swagyswagy23-maxip-${{ github.run_id }}
   cancel-in-progress: false
 
 jobs:
   npm-automation:
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 20   # <-- move it here, inside 'strategy'
       matrix:
-        os: 
+        os:
           - ubuntu-latest
           - ubuntu-latest
           - ubuntu-latest
@@ -25,11 +24,12 @@ jobs:
           - macos-latest
           - macos-latest
           - macos-latest
-        version: 
-          - dependency-insight@1.6.1
-          - dependency-insight@1.8.0
-          - dependency-insight@1.9.0
-          - dependency-insight@latest
+        version:
+          - "1.6.1"
+          - "1.8.0"
+          - "1.9.0"
+          - "latest"
+      max-parallel: 36
     env:
       UNIQUE_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.version }}-${{ github.job }}
     steps:
@@ -45,7 +45,7 @@ jobs:
         run: npm cache clean --force
 
       - name: Install Package Globally
-        run: npm install -g ${{ matrix.version }}
+        run: npm install -g dependency-insight@${{ matrix.version }}
 
       - name: Run Script
         run: |
@@ -53,7 +53,7 @@ jobs:
           node test.js
 
       - name: Uninstall Package
-        run: npm uninstall -g ${{ matrix.version }}
+        run: npm uninstall -g dependency-insight
 
       - name: Final NPM Cache Cleanup
         run: npm cache clean --force
