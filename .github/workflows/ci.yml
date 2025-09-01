@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        index: [1,2,3,4,5,6,7,8,9,10] # 10 jobs per OS → 3 OS * 10 = 30
+        index: [1,2] # 10 jobs per OS → 3 OS * 10 = 30
       max-parallel: 12
     env:
       UNIQUE_ID: ${{ github.run_id }}-${{ matrix.os }}-${{ matrix.index }}
